@@ -1,5 +1,5 @@
 import CardBox from "./Card";
-import { FormEvent, ChangeEvent, useState } from "react";
+import { FormEvent, useRef, useState } from "react";
 
 interface UserInfo {
   name: string;
@@ -12,46 +12,41 @@ interface FormProps {
 }
 
 export default function Form({ getUserInfo }: FormProps) {
-  const [name, setName] = useState("");
-  const [live, setLive] = useState("");
-  const [email, setEmail] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  // Initialize refs with null safely
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const liveInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
 
   const addUser = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    // Check for empty inputs using refs
     if (
-      name.trim().length === 0 ||
-      live.trim().length === 0 ||
-      email.trim().length === 0
+      !nameInputRef.current?.value.trim() ||
+      !liveInputRef.current?.value.trim() ||
+      !emailInputRef.current?.value.trim()
     ) {
       setErrorMessage("All fields are required");
       return;
     }
     setErrorMessage("");
 
-    const userInfo = {
-      name,
-      live,
-      email,
+    // Collect user info from refs
+    const userInfo: UserInfo = {
+      name: nameInputRef.current.value,
+      live: liveInputRef.current.value,
+      email: emailInputRef.current.value,
     };
 
     getUserInfo(userInfo);
-    setName("");
-    setLive("");
-    setEmail("");
-  };
 
-  const handleName = (event: ChangeEvent<HTMLInputElement>) => {
-    setName(event.target.value);
-  };
+    // Clear input fields after submission
+    nameInputRef.current.value = ""; 
+    liveInputRef.current.value = ""; 
+    emailInputRef.current.value = ""; 
 
-  const handleLive = (event: ChangeEvent<HTMLInputElement>) => {
-    setLive(event.target.value);
-  };
-
-  const handleEmail = (event: ChangeEvent<HTMLInputElement>) => {
-    setEmail(event.target.value);
-  };
+    console.log(userInfo); // Optional: For debugging
+  }; // add User Function
 
   return (
     <section>
@@ -59,20 +54,15 @@ export default function Form({ getUserInfo }: FormProps) {
         <form onSubmit={addUser}>
           <div className="form-div">
             <label htmlFor="name">Name</label>
-            <input type="text" id="name" value={name} onChange={handleName} />
+            <input type="text" ref={nameInputRef} />
           </div>
           <div className="form-div">
             <label htmlFor="live">Live</label>
-            <input type="text" id="live" value={live} onChange={handleLive} />
+            <input type="text" ref={liveInputRef} />
           </div>
           <div className="form-div">
             <label htmlFor="email">Email</label>
-            <input
-              type="text"
-              id="email"
-              value={email}
-              onChange={handleEmail}
-            />
+            <input type="email" ref={emailInputRef} />
           </div>
           <button className="btn" type="submit">
             Add User

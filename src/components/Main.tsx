@@ -12,7 +12,7 @@ export default function Main() {
   const [userInfos, setUserInfos] = useState<UserInfo[]>([]);
 
   const getUserInfo = (userInfoObj : UserInfo)  => {
-    console.log(userInfoObj);
+    
     setUserInfos([...userInfos, userInfoObj]);
   }
   return (
